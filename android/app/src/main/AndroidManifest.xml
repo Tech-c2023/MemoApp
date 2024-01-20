@@ -1,6 +1,7 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application
-        android:label="memo_app"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.cooking_memo_app">
+   <application
+        android:label="cooking_memo_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
