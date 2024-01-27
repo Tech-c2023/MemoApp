@@ -58,6 +58,7 @@ class _UpdateFieldState extends State<UpdateField> {
                         },
                         decoration: const InputDecoration(
                           labelText: 'メニュー名',
+                          hintText: '料理名を入力してください',
                           border: OutlineInputBorder(),
                         ),
                         onChanged: (String text) {
@@ -68,9 +69,9 @@ class _UpdateFieldState extends State<UpdateField> {
                         },
                         initialValue: results[0][0]['name'],
                       ),
-                      const Text('ジャンル：'),
+                      const Text(style: TextStyle(fontSize: 20),'ジャンル'),
                       UpdateGenre(items: genres),
-                      const Text('材料'),
+                      const Text(style: TextStyle(fontSize: 20),'材料'),
                       UpdateMaterial(items: materials),
 
 
