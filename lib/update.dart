@@ -1,6 +1,10 @@
+import 'package:cooking_memo_app/recipe.dart';
+import 'package:cooking_memo_app/updateGenre.dart';
+import 'package:cooking_memo_app/updateMaterial.dart';
 import 'package:flutter/material.dart';
 
 import 'database.dart';
+import 'recipe.dart';
 
 class UpdatePage extends StatelessWidget{
   final Object? id;
@@ -27,7 +31,10 @@ class UpdateField extends StatefulWidget {
 class _UpdateFieldState extends State<UpdateField> {
 
   final Provider =  DatabaseProvider.instance;
+  final Recipe = RecipeInfo();
   late List<dynamic> results;
+  late List<Map<String, dynamic>> genres;
+  late List<Map<String, dynamic>> materials;
 
   String name = '';
 
@@ -55,13 +62,18 @@ class _UpdateFieldState extends State<UpdateField> {
                         ),
                         onChanged: (String text) {
                           setState((){
-                            name = text;
+                            // name = text;
+                            Recipe.name = text;
                           });
                         },
                         initialValue: results[0][0]['name'],
                       ),
-                      for(var genre in results[1])
-                        Text(genre),
+                      const Text('ジャンル：'),
+                      UpdateGenre(items: genres),
+                      const Text('材料'),
+                      UpdateMaterial(items: materials),
+
+
                       for(var material in results[2])
                         Text(material),
                       for(var making in results[3])
@@ -105,6 +117,8 @@ class _UpdateFieldState extends State<UpdateField> {
       var RecipeDetail = await Provider.queryOneRecipe(id);
       results = RecipeDetail;
     }
+    genres = await Provider.queryGenre();
+    materials = await Provider.queryMaterial();
     return 'done';
   }
 
