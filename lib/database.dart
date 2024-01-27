@@ -110,6 +110,45 @@ class DatabaseProvider {
       )
     '''
     );
+
+  //  初期データ
+    var genres = {
+      [ "和食", 1 ],
+      [ "洋食", 1 ],
+      [ "中華", 1 ],
+      [ "丼もの", 2 ],
+      [ "麺類", 2 ],
+      [ "肉", 2 ],
+      [ "魚", 2 ],
+    };
+    for (var genre in genres) {
+      await db.insert(tableGenres,
+        { columnName : genre[0], columnPrimary : genre[1]}
+      );
+    }
+    var materials = [
+      "じゃがいも",
+      "たまねぎ",
+      "にんじん",
+      "きゅうり",
+      "白菜",
+      "ごぼう",
+      "ねぎ",
+      "豆腐",
+      "豚肉",
+      "鶏肉",
+      "牛肉",
+      "醤油",
+      "砂糖",
+      "塩",
+      "味噌",
+    ];
+    for (var material in materials) {
+      await db.insert(tableMaterials,
+          { columnName : material}
+      );
+    }
+
   }
 
   Future<List<List<Map<String, dynamic>>>> queryAllRows() async {
@@ -171,6 +210,15 @@ class DatabaseProvider {
       ));
     });
     return res;
+  }
+
+  Future<List<Map<String, Object?>>> queryGenre() async{
+    Database? db = await instance.database;
+    return await db!.query(tableGenres);
+  }
+  Future<List<Map<String, Object?>>> queryMaterial() async{
+    Database? db = await instance.database;
+    return await db!.query(tableMaterials);
   }
 }
 
