@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 
 import 'database.dart';
-import 'detail.dart';
-import 'update.dart';
+import 'recipe.dart';
 
-class SelectPage extends StatelessWidget {
+class SelectPage extends StatelessWidget{
+  const SelectPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("一覧ページ"),
-        centerTitle: true,  // 中央寄せを設定
-      ),
-      body: Center(
-        child: SelectField(),
-      ),
+        centerTitle: true,
+    ),body: const Center(
+        child: SelectField()
+    ),
+      // 料理名の登録(+ボタンを右下に)
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
@@ -22,14 +23,9 @@ class SelectPage extends StatelessWidget {
             builder: (BuildContext context) {
               return InsertDialog();
             },
-          ).then((_) {
-            // ダイアログが閉じたら画面を再読み込み
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => SelectPage()),
-            );
-          });
+          );
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -42,40 +38,39 @@ class InsertDialog extends StatefulWidget {
 
 class _InsertDialogState extends State<InsertDialog> {
   final _textController = TextEditingController();
+  final Provider =  DatabaseProvider.instance;
 
+  //　メニュー名登録用ポップアップ
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("メニュー名を入力してください"),
+      title: const Text("メニュー名を入力してください"),
       content: TextField(
         controller: _textController,
         autofocus: true,
-        decoration: InputDecoration(labelText: "メニュー名"),
+        decoration: const InputDecoration(labelText: "メニュー名"),
       ),
       actions: [
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: Text("キャンセル"),
+          child: const Text("キャンセル"),
         ),
         ElevatedButton(
           onPressed: () async {
             // 登録ボタンが押されたときの処理
             final enteredText = _textController.text;
-
-            // データベースに新しいレコードを挿入
-            await DatabaseProvider.instance.insertRecipe(enteredText);
-
+            if(enteredText != ""){
+              // データベースに新しいレコードを挿入
+              await Provider.insertRecipe(enteredText);
+            }
             // ダイアログを閉じる
-            Navigator.of(context).pop();
-
-            // 画面を再読み込み
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => SelectPage()),
-            );
+            Navigator.pop(context);
+            //一覧を再表示
+            Navigator.pushReplacementNamed(context, '/select');
           },
-          child: Text("登録"),
+          child: const Text("登録"),
         ),
       ],
     );
@@ -89,143 +84,165 @@ class _InsertDialogState extends State<InsertDialog> {
 }
 
 class SelectField extends StatefulWidget {
+  const SelectField({Key? key}) : super(key: key);
+
   @override
   _SelectFieldState createState() => _SelectFieldState();
 }
 
 class _SelectFieldState extends State<SelectField> {
-  final Provider = DatabaseProvider.instance;
+
+  var Provider =  DatabaseProvider.instance;
+  final Recipe = RecipeInfo();
   late List<dynamic> results;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _query(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Center(
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (var result in results)
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.zero,
-                                      ),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            DetailPage(id: result['id']),
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    result['name'],
-                                    style: const TextStyle(
-                                      fontSize: 24,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              ElevatedButton(
-                                style: ButtonStyle(
-                                  shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.zero,
-                                    ),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          UpdatePage(id: result['id']),
-                                    ),
-                                  ).then((_) {
-                                    // 画面を再読み込み
-                                    setState(() {});
-                                  });
-                                },
-                                child: const Icon(Icons.more_horiz),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
+        future: _query(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Center(
+              //一覧表示
+                child:ListView.builder(
+                    itemCount: results.length,
+                    itemBuilder: (BuildContext context, int index){
+                      final item = results[index];
+                      //　横にシュッてしたら、削除する
+                      return Dismissible(
+                        key: ValueKey<int>(item['id']),
+                        onDismissed: (direction){
+                          _deleteRecipe(item['id']);
+                          results.removeAt(index);
+                        },
+                        background: Container(color: Colors.red),
+                        child: _listItem(item['name'], item['id']),
+                      );
+                    }
+                )
+            );
+          }else if (snapshot.hasError) {
+            print(snapshot.error);
+            return const Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 60,
+            );
+          }else{
+            return Center(
+              child: Column(
+                children: const [
+                  SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: CircularProgressIndicator(),
                   ),
-                ),
-              ],
-            ),
-          );
-        } else if (snapshot.hasError) {
-          print(snapshot.error);
-          return const Icon(
-            Icons.error_outline,
-            color: Colors.red,
-            size: 60,
-          );
-        } else {
-          return Center(
-            child: Column(
-              children: const [
-                SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: CircularProgressIndicator(),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 16),
-                  child: Text('Awaiting result...'),
-                ),
-              ],
-            ),
-          );
+                  Padding(
+                    padding: EdgeInsets.only(top: 16),
+                    child: Text('Awaiting result...'),
+                  ),
+                ],
+              ),
+            );
+          }
         }
-      },
     );
   }
 
-  Future<String> _query() async {
-    var RecipeAlls = await Provider.queryRecipes();
-    results = await _setMapRecipeName(RecipeAlls);
-    print('すべてのデータを紹介しました。_query');
-    return 'done';
+  //　ページの読み込み時に呼ばれる
+  //　レシピテーブルから全件取ってくる
+  Future<List<dynamic>> _query() async {
+    try{
+      var RecipeAlls = await Provider.queryRecipes();
+      results = await _setMapRecipeName(RecipeAlls);
+    }catch(e){
+      results = await _query();
+    }
+    return results;
+
   }
 
-  Future<List<Map<String, dynamic>>> _setMapRecipeName(dynamic s) async {
-    assert(s != null);
+  //　とってきたデータを扱いやすくするために型を整理
+  Future< List<Map<String, dynamic>> > _setMapRecipeName(dynamic s) async {
+    assert( s != null);
     List<Map<String, dynamic>> res = [];
     for (var element in s) {
-      Map<String, dynamic> data = {
-        'id': element['_id'],
-        'name': element['name'],
-      };
-      res.add(data);
+      if(element[Provider.columnDelete] != 1){
+        Map<String, dynamic> data  = {
+          'id' : element[Provider.columnId],
+          'name': element[Provider.columnName],
+        };
+        res.add(data);
+      }
     }
     return res;
   }
 
-  void initState() {
-    super.initState();
-    _query();
+  //　listViewで回す用のwidget
+  Widget _listItem(String name, int id){
+    return Column(
+      children: [
+        Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // レシピ名のボタン
+              Expanded(
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
+                    )
+                  ),
+                  onPressed:  (){
+                    // 各詳細ページへ
+                    Navigator.pushNamed(context, '/detail' ,arguments: id);
+                  },
+                  child: Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 24,
+                    ),
+                  ),
+                ),
+              ),
+              //　三点ドットのボタン
+              Align(
+                alignment: Alignment.topRight,
+                child: ElevatedButton(
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                      ),
+                    ),
+                    onPressed: (){
+                      // 編集ページへ
+                      Navigator.pushNamed(
+                          context,
+                          '/update',
+                          arguments: id
+                      ).then((value){
+                        //　編集ページから戻ってきたら、編集時に使っていたクラスの中身を消去
+                        Recipe.clearRecipeData();
+                      });
+                    },
+                    child: const Icon(
+                        Icons.more_horiz
+                    )
+                ),
+              ),
+            ]
+        ),
+      ],
+    );
   }
+
+  //　レシピの論理削除を呼び出す
+  Future<void> _deleteRecipe(int id) async {
+    var i = await Provider.deleteRecipe(id);
+  }
+
 }

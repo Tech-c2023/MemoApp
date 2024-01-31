@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'database.dart';
 
+//　一覧ページからレシピのIDを受け取る
 class DetailPage extends StatelessWidget{
   final Object? id;
   const DetailPage({Key? key, required this.id}) : super(key: key);
@@ -41,11 +42,11 @@ class _DetailFieldState extends State<DetailField> {
                     children: [
                       Text(results[0][0]['name']),
                       for(var genre in results[1])
-                        Text(genre),
+                        Text(genre.toString()),
                       for(var material in results[2])
-                        Text(material),
+                        Text(material.toString()),
                       for(var making in results[3])
-                        Text(making)
+                        Text(making.toString())
                     ],
                   )
               ),
@@ -78,14 +79,17 @@ class _DetailFieldState extends State<DetailField> {
     );
   }
 
+  //　指定されたレシピの内容をすべて取得
   Future<String> _query() async {
     String id_str = widget.id.toString();
     int? id = int.tryParse(id_str);
     if(id != null) {
       var RecipeDetail = await Provider.queryOneRecipe(id);
       results = RecipeDetail;
+      print(results);
     }
     return 'done';
   }
 
+  // dynamic _
 }
