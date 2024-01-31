@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'recipe.dart';
 
 class UpdateGenre extends StatefulWidget {
-  final List<Map<String, dynamic>> items;
+  final Map<int, String> items;
   const UpdateGenre({Key? key, required this.items}) : super(key: key);
 
   @override
@@ -19,13 +19,15 @@ class _UpdateGenresState extends State<UpdateGenre> {
         children: [
           Row(
             children: [
-              for (String item in Recipe.genreNames) ... {
+              //拗ねに登録、入力されたジャンルを表示
+              for (String item in Recipe.genreNames.values) ... {
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: GestureDetector(
                     onTap:(){
                       setState( (){
-                        Recipe.genreNames.remove(item);
+                        //　クリックしたら、消える
+                        Recipe.genreNames.removeWhere((key, value) => value == item);
                       });
                     },
                     child: Text(item),
@@ -34,34 +36,37 @@ class _UpdateGenresState extends State<UpdateGenre> {
               }
             ],
           ),
+          // ジャンルのドロップダウン
           Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
               DropdownButton(
                 items: [
                   const DropdownMenuItem(
-                    value: "",
+                    value: 0,
                     child: Text("未選択"),
                   ),
-                  for ( var genre in widget.items) ... {
+                  // 画面遷移時に渡されたitemsに初期登録されているジャンル名が入っている
+                  for ( var key in widget.items.keys) ... {
                     DropdownMenuItem(
-                      value: genre['name'].toString(),
-                      child: Text(genre['name']),
+                      value: key,
+                      child: Text(widget.items[key]!),
                     ),
                   }
                 ],
                 value: Recipe.selectingGenre,
-                onChanged: (String? value) {
+                onChanged: (value) {
                   setState( () {
-                    Recipe.selectingGenre = value!;
+                    Recipe.selectingGenre = int.parse(value.toString());
                   });
                 },
               ),
+              //追加ボタン
               ElevatedButton(
                 onPressed:  (){
                   setState( () {
-                    if(!Recipe.genreNames.contains(Recipe.selectingGenre) && Recipe.selectingGenre != "") {
-                      Recipe.genreNames.add(Recipe.selectingGenre);
+                    if(!Recipe.genreNames.keys.contains(Recipe.selectingGenre) && Recipe.selectingGenre != 0) {
+                      Recipe.genreNames.addAll({Recipe.selectingGenre : widget.items[Recipe.selectingGenre]!});
                     }
                   });
                 },
