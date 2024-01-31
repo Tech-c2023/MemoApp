@@ -9,7 +9,7 @@ class SelectPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
+      appBar: AppBar(
         title: const Text("一覧ページ"),
         centerTitle: true,
     ),body: const Center(
@@ -94,7 +94,6 @@ class _SelectFieldState extends State<SelectField> {
 
   var Provider =  DatabaseProvider.instance;
   final Recipe = RecipeInfo();
-
   late List<dynamic> results;
 
   @override
@@ -175,7 +174,6 @@ class _SelectFieldState extends State<SelectField> {
         };
         res.add(data);
       }
-
     }
     return res;
   }
