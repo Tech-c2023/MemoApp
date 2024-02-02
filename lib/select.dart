@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'database.dart';
 import 'recipe.dart';
 
@@ -10,7 +9,9 @@ class SelectPage extends StatelessWidget{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.orange,
         title: const Text("一覧ページ"),
+
         centerTitle: true,
     ),body: const Center(
         child: SelectField()

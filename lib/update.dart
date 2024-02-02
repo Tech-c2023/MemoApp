@@ -1,169 +1,147 @@
+import 'package:flutter/material.dart';
+import 'package:cooking_memo_app/database.dart';
 import 'package:cooking_memo_app/recipe.dart';
 import 'package:cooking_memo_app/updateGenre.dart';
 import 'package:cooking_memo_app/updateMaking.dart';
 import 'package:cooking_memo_app/updateMaterial.dart';
-import 'package:flutter/material.dart';
 
-import 'database.dart';
-import 'recipe.dart';
-
-class UpdatePage extends StatelessWidget{
+class UpdatePage extends StatelessWidget {
   final Object? id;
+
   const UpdatePage({Key? key, required this.id}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
+      appBar: AppBar(
+        backgroundColor: Colors.orange,
         title: const Text("編集ページ"),
-    ),body: Center(
-        child: UpdateField(id: id)
+        centerTitle: true,
       ),
+      body: UpdateField(id: id),
     );
   }
 }
+
 class UpdateField extends StatefulWidget {
   final Object? id;
+
   const UpdateField({Key? key, required this.id}) : super(key: key);
+
   @override
   _UpdateFieldState createState() => _UpdateFieldState();
 }
 
 class _UpdateFieldState extends State<UpdateField> {
-
-  final Provider =  DatabaseProvider.instance;
-  final Recipe = RecipeInfo();
+  final provider = DatabaseProvider.instance;
+  final recipe = RecipeInfo();
   late List<dynamic> results;
   late Map<int, String> genres;
   late Map<int, String> materials;
 
-  String name = '';
-
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: _query(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Center(
-              child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      //  レシピ名
-                      TextFormField(
-                        validator: (value){
-                          if(value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        },
-                        decoration: const InputDecoration(
-                          labelText: 'メニュー名',
-                          hintText: '料理名を入力してください',
-                          border: OutlineInputBorder(),
-                        ),
-                        onChanged: (String text) {
-                          setState((){
-                            // name = text;
-                            Recipe.name = text;
-                          });
-                        },
-                        initialValue: results[0][0]['name'],
-                      ),
-                      //　ジャンル
-                      const Text(
-                        'ジャンル：',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                      //　詳細はupdateGenreファイル
-                      UpdateGenre(items: genres),
-                      //　材料
-                      const Text(
-                        '材料:',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                      //　詳細はupdateMaterialファイル
-                      UpdateMaterial(items: materials),
-                      //　作りかた
-                      const Text(
-                        '作り方:',
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                      //　詳細はupdateMakingファイル
-                      const UpdateMaking(),
-
-                      // 登録ボタン
-                      ElevatedButton(
-                          onPressed: (){
-                          _updateAll();
-                          Navigator.pushNamedAndRemoveUntil(context, '/select',
-                          ModalRoute.withName('/'));
-                      },
-                          child: const Text("登録")
-                      )
-                    ],
-                  )
-              ),
-            );
-          }else if (snapshot.hasError) {
-            print(snapshot.error);
-              return const Icon(
-                    Icons.error_outline,
-                    color: Colors.red,
-                    size: 60,
-                );
-          }else{
-            return Center(
-              child: Column(
-                children: const [
-                  SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: CircularProgressIndicator(),
+      future: _query(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 60,
+            ),
+          );
+        } else {
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(34.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  initialValue: results[0][0]['name'],
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                  decoration: InputDecoration(
+                    labelText: 'レシピ名',
+                    hintText: '料理名を入力してください',
+                    border: OutlineInputBorder(),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: Text('Awaiting result...'),
+                  onChanged: (text) {
+                    setState(() {
+                      recipe.name = text;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter some text';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'ジャンル：',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                ),
+                SizedBox(height: 12),
+                UpdateGenre(items: genres), /// updateGenre.dart
+                Text(
+                  '材料:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                ),
+                UpdateMaterial(items: materials), /// updateMaterial.dart
+                SizedBox(height: 20),
+                Text(
+                  '作り方:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                ),
+                UpdateMaking(), /// updateMaking.dart
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    _updateAll(); /* 更新クエリを実行 */
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/select', /* 一覧ページに遷移 */
+                      ModalRoute.withName('/'),
+                    );
+                  },
+                  child: Text(
+                      "登録する",
+                    style: TextStyle(fontSize: 40),
                   ),
-                ],
-              ),
-            );
+                ),
+              ],
+            ),
+          );
         }
-    }
+      },
     );
   }
 
-  //　ページ読み込み時に動作
-  Future<String> _query() async {
-    String id_str = widget.id.toString();
-    int? id = int.tryParse(id_str);
-    //　指定したレシピの詳細を取得
-    if(id != null) {
-      var RecipeDetail = await Provider.queryOneRecipe(id);
-      results = RecipeDetail;
-      Recipe.mapQuery(results);
+  Future<void> _query() async {
+    String idStr = widget.id.toString();
+    int? id = int.tryParse(idStr);
+    if (id != null) {
+      recipe.clearRecipeData();
+      var recipeDetail = await provider.queryOneRecipe(id);
+      results = recipeDetail;
+      recipe.mapQuery(results);
     }
-    //　ジャンルと材料の選択肢を取得
-    genres = await Provider.queryGenre();
-    materials = await Provider.queryMaterial();
-    return 'done';
+    genres = await provider.queryGenre();
+    materials = await provider.queryMaterial();
   }
 
-  //　すべての情報をアップデートする
   void _updateAll() async {
-    String id_str = widget.id.toString();
-    int? id = int.tryParse(id_str);
-    if(id != null) {
-      var _ = await Provider.updateRecipe(id, Recipe);
+    String idStr = widget.id.toString();
+    int? id = int.tryParse(idStr);
+    if (id != null) {
+      await provider.updateRecipe(id, recipe);
     }
-    Recipe.clearRecipeData();
+    recipe.clearRecipeData();
   }
-
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'recipe.dart';
 
 class UpdateGenre extends StatefulWidget {
@@ -30,7 +29,10 @@ class _UpdateGenresState extends State<UpdateGenre> {
                         Recipe.genreNames.removeWhere((key, value) => value == item);
                       });
                     },
-                    child: Text(item),
+                    child: Text(
+                        '#${item}',
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
                 )
               }
@@ -50,7 +52,7 @@ class _UpdateGenresState extends State<UpdateGenre> {
                   for ( var key in widget.items.keys) ... {
                     DropdownMenuItem(
                       value: key,
-                      child: Text(widget.items[key]!),
+                      child: Text( widget.items[key]!),
                     ),
                   }
                 ],
@@ -73,7 +75,7 @@ class _UpdateGenresState extends State<UpdateGenre> {
                 child: const Text(
                   "追加",
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 20,
                   ),
                 ),
               ),

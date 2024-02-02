@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'recipe.dart';
 
 class UpdateMaterial extends StatefulWidget {
@@ -26,7 +25,7 @@ class _UpdateMaterialState extends State<UpdateMaterial> {
               for (var item in Recipe.materials.keys) ...{
                 GestureDetector(
                   onTap: () {
-                    //クリックしたら消える
+                    //タップしたら消える
                     setState(() {
                       Recipe.materials.removeWhere((key, value) => key == item);
                       Recipe.quantities.removeWhere((key, value) =>
@@ -36,7 +35,7 @@ class _UpdateMaterialState extends State<UpdateMaterial> {
                   child: Container(
                     width: _screenSize.width * 0.8,
                     decoration: const BoxDecoration(
-                        border: Border(
+                        border: Border( /* 罫線 */
                             bottom: BorderSide(
                               color: Colors.black,
                               width: 1,
@@ -50,11 +49,13 @@ class _UpdateMaterialState extends State<UpdateMaterial> {
                         children: [
                           Container(
                               width: _screenSize.width * 0.4,
+                              /* 食材を表示 */
                               child: Text(Recipe.materials[item]!)
                           ),
                           Container(
                               alignment: Alignment.centerRight,
                               width: _screenSize.width * 0.4,
+                              /* 分量を表示 */
                               child: Text(Recipe.quantities[item]!)
                           ),
                         ],
@@ -69,7 +70,7 @@ class _UpdateMaterialState extends State<UpdateMaterial> {
             width: _screenSize.width * 0.8,
             decoration: const BoxDecoration(
                 border: Border(
-                    bottom: BorderSide(
+                    bottom: BorderSide( /* 罫線 */
                       color: Colors.black,
                       width: 1,
                     )
@@ -144,7 +145,7 @@ class _UpdateMaterialState extends State<UpdateMaterial> {
                   child: const Text(
                     "追加",
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 20,
                     ),
                   ),
                 ),

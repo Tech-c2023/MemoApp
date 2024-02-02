@@ -1,8 +1,6 @@
 import 'package:cooking_memo_app/detail.dart';
 import 'package:cooking_memo_app/update.dart';
 import 'package:flutter/material.dart';
-
-import 'database.dart';
 import 'select.dart';
 import 'update.dart';
 
