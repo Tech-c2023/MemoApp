@@ -11,12 +11,11 @@ class SelectPage extends StatelessWidget{
       appBar: AppBar(
         backgroundColor: Colors.orange,
         title: const Text("一覧ページ"),
-
         centerTitle: true,
     ),body: const Center(
         child: SelectField()
     ),
-      // 料理名の登録(+ボタンを右下に)
+      // メニュー名の登録(+ボタンを右下に)
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
@@ -26,7 +25,7 @@ class SelectPage extends StatelessWidget{
             },
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add), /* +ボタン */
       ),
     );
   }
@@ -104,12 +103,12 @@ class _SelectFieldState extends State<SelectField> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Center(
-              //一覧表示
+              // 一覧表示
                 child:ListView.builder(
                     itemCount: results.length,
                     itemBuilder: (BuildContext context, int index){
                       final item = results[index];
-                      //　横にシュッてしたら、削除する
+                      //　横にスワイプしたら、削除する
                       return Dismissible(
                         key: ValueKey<int>(item['id']),
                         onDismissed: (direction){
@@ -197,7 +196,7 @@ class _SelectFieldState extends State<SelectField> {
                     )
                   ),
                   onPressed:  (){
-                    // 各詳細ページへ
+                    // レシピ名を押すと、各詳細ページへ
                     Navigator.pushNamed(context, '/detail' ,arguments: id);
                   },
                   child: Text(

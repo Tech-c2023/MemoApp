@@ -58,6 +58,7 @@ class _DetailFieldState extends State<DetailField> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
+                  /* 料理名を表示 */
                   '${results[0][0]['name']}',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 32),
                 ),
@@ -65,6 +66,7 @@ class _DetailFieldState extends State<DetailField> {
                 Wrap(
                   spacing: 12,
                   children: results[1]
+                      /* ジャンルタグを表示 */
                       .map<Widget>((genre) => Chip(label: Text('#${genre['name']}'))).toList(),
                 ),
                 SizedBox(height: 40),
@@ -76,6 +78,7 @@ class _DetailFieldState extends State<DetailField> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: results[2]
                       .map<Widget>((material) => Text(
+                    /* 材料を表示 */
                     ' - ${material['name']}: ${material['quantity']}',
                     style: TextStyle(fontSize: 20),
                   ))
@@ -96,6 +99,7 @@ class _DetailFieldState extends State<DetailField> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
+                            /* 作り方を表示 例 1)ご飯をレンジで温める */
                             ' ${results[3][index]['orderNum']}) ${results[3][index]['body']}',
                             style: TextStyle(fontSize: 20),
                           ),

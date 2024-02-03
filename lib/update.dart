@@ -123,11 +123,13 @@ class _UpdateFieldState extends State<UpdateField> {
     );
   }
 
+  // ページ読み込み時に動作
   Future<void> _query() async {
     String idStr = widget.id.toString();
     int? id = int.tryParse(idStr);
+    /* 指定したレシピの詳細を取得 */
     if (id != null) {
-      recipe.clearRecipeData();
+      recipe.clearRecipeData(); /* 入力されたレシピ情報を初期化 */
       var recipeDetail = await provider.queryOneRecipe(id);
       results = recipeDetail;
       recipe.mapQuery(results);
@@ -136,6 +138,7 @@ class _UpdateFieldState extends State<UpdateField> {
     materials = await provider.queryMaterial();
   }
 
+  /* 全ての情報を更新する */
   void _updateAll() async {
     String idStr = widget.id.toString();
     int? id = int.tryParse(idStr);
