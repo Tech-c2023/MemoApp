@@ -63,6 +63,7 @@ class _UpdateFieldState extends State<UpdateField> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 TextFormField(
+                  readOnly: true, // 編集不可
                   initialValue: results[0][0]['name'],
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
                   decoration: InputDecoration(
@@ -70,11 +71,6 @@ class _UpdateFieldState extends State<UpdateField> {
                     hintText: '料理名を入力してください',
                     border: OutlineInputBorder(),
                   ),
-                  onChanged: (text) {
-                    setState(() {
-                      recipe.name = text;
-                    });
-                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter some text';
